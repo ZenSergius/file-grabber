@@ -1,1 +1,20 @@
-{    "name": "vendor/FileGrabber",    "description": "Allows to download files by their url into the file system",    "authors": [        {            "name": "ZenSerius",            "email": "serg.progr@gmail.com"        }    ],    "minimum-stability": "dev",    "require": {        "php": ">=5.3.0"    },    "autoload": {        "psr-4": {            "FileGrabber": "src/"        }    }}
+{
+    "name": "vendor/file-grabber",
+    "description": "Allows to download files by their url into the file system",
+	"license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "ZenSergius",
+            "email": "serg.progr@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FileGrabber\\": "src/FileGrabber"
+        }
+    }
+}

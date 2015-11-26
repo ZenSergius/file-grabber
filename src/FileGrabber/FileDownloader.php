@@ -2,14 +2,14 @@
 
 namespace FileGrabber;
 
-//require __DIR__ . '/Grabber/GetContentGrabber.php';
-//require __DIR__ . '/Grabber/CurlGrabber.php';
+use FileGrabber\Grabber\GetContentGrabber as GetContentGrabber;
+use FileGrabber\Grabber\CurlGrabber as CurlGrabber;
 
 class FileDownloader
 {
     protected $fileGrabber = null;
     private $grabber;
-    private $defaultSavePath = 'images';
+    private $defaultSavePath = 'images/';
 
     public function __construct($defaultSavePath, $grabMethod = 'getcontent')
     {
@@ -22,10 +22,10 @@ class FileDownloader
 
         switch ($grabMethod) {
             case 'getcontent':
-                $this->grabber = new \FileGrabber\Grabber\GetContentGrabber;
+                $this->grabber = new GetContentGrabber();
                 break;
             case 'curl':
-                $this->grabber = new \FileGrabber\Grabber\CurlGrabber;
+                $this->grabber = new CurlGrabber();
                 break;
             default:
                 throw new Exception("Incorrect grab method");
