@@ -28,7 +28,7 @@ class FileDownloader
                 $this->grabber = new CurlGrabber();
                 break;
             default:
-                throw new Exception("Incorrect grab method");
+                throw new InvalidArgumentException("Incorrect grab argument: $grabMethod");
         }
     }
 
