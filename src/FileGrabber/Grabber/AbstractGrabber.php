@@ -4,5 +4,11 @@ namespace FileGrabber\Grabber;
 
 abstract class AbstractGrabber
 {
-    abstract public function grabFile($fileUrl, $savePath);
+    protected $grabberName;
+    abstract public function grabFile($fileUrl);
+    abstract protected function isAvailable();
+    public function getName()
+    {
+        return $this->grabberName;
+    }
 }

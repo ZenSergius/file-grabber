@@ -1,12 +1,31 @@
 <?php
-
 namespace FileGrabber\Grabber;
 
 class GetContentGrabber extends AbstractGrabber
 {
-    public function grabFile($fileUrl, $savePath)
+    public function __construct()
     {
-        $file = file_get_contents($fileUrl);
-        file_put_contents('images/'.'getcontent_'.$savePath, $file);
+        if (!$this->isAvailable()) {
+            throw new GrabberException('Can\'t use file_get_content because allow_url_fopen turned off.');
+        }
+
+        $this->grabberName = 'getcontent';
     }
+
+    protected function isAvailable()
+    {
+        return ini_get('allow_url_fopen') ? true : false;
+    }
+
+    public function grabFile($fileUrl)
+    {
+        $file_content = file_get_contents($fileUrl);
+
+        if (!$file_content) {
+            throw new \LogicException("Unable to get data from: $fileUrl");
+        }
+
+        return $file_content;
+    }
+
 }
