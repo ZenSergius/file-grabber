@@ -3,7 +3,7 @@
 	"type": "library",
     "description": "Allows to download files by their url into the file system",
 	"keywords": ["download", "grab"],
-	"homepage": "https://github.com/ZenSergius/file-grabber"
+	"homepage": "https://github.com/ZenSergius/file-grabber",
 	"license": "MIT",
     "authors": [
         {
