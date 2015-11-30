@@ -19,10 +19,10 @@ class GetContentGrabber extends AbstractGrabber
 
     public function grabFile($fileUrl)
     {
-        $file_content = file_get_contents($fileUrl);
-
-        if (!$file_content) {
-            throw new \LogicException("Unable to get data from: $fileUrl");
+        try {
+            $file_content = file_get_contents($fileUrl);
+        } catch (\Exception $ex) {
+            throw new \InvalidArgumentException("Unable to get data from: $fileUrl");
         }
 
         return $file_content;

@@ -37,8 +37,8 @@ class FileDownloader
     private function createDirPath($dirPath)
     {
         if (file_exists($dirPath)) {
-            if (is_writable($dirPath)) {
-                if (!chmod($dirPath, 0644)) {
+            if (!is_writable($dirPath)) {
+                if (!chmod($dirPath, 0644)) {//die('aaaaaa');
                     throw new \RuntimeException('Can\'t set directory \'' . $dirPath . '\'' . 'writable.');
                 }
             }
@@ -49,15 +49,15 @@ class FileDownloader
 
             if (!is_writable($dirPath)) {
                 if (!chmod($dirPath, 0644)) {
-                    throw new \RuntimeException('Can\'t set directory \'' . $dirPath . '\'' . 'writable.');
+                    throw new \RuntimeException('Can not set directory \'' . $dirPath . '\'' . 'writable.');
                 }
             }
         }
     }
 
-    private function setGrabber($grabMethod)
+    private function setGrabber($grabMethod = null)
     {
-        if ($grabMethod) {
+        if (!empty($grabMethod)) {
             switch ($grabMethod) {
                 case 'getcontent':
                     $this->grabber = new GetContentGrabber();
@@ -93,6 +93,7 @@ class FileDownloader
             $savePath = $this->defaultSavePath;
         } else {
             $savePath = $this->fixSlashes($savePath);
+            $this->createDirPath($savePath);
         }
 
         $fileContent = $this->grabber->grabFile($fileUrl);
@@ -108,8 +109,10 @@ class FileDownloader
         }
 
         if (false === file_put_contents($savePath . $fileName, $fileContent)) {
-            throw new \RuntimeException('Can\'t save file \''.$fileName.'\' to the selected path\'' . $savePath . '\'');
+            throw new \RuntimeException('Can\'t save file \''.$fileName.'\' to the selected path \'' . $savePath . '\'');
         }
+
+        return $fileName;
     }
 
     private function getFileExtensionByContent($fileContent)
@@ -127,7 +130,7 @@ class FileDownloader
         if (isset($filesExtensions[$mime])) {
             $fileExt = $filesExtensions[$mime];
         } else {
-            throw new \RuntimeException('Incorrect file extension');
+            throw new \InvalidArgumentException('Incorrect file extension');
         }
 
         return $fileExt;
@@ -135,7 +138,7 @@ class FileDownloader
 
     protected function fixSlashes($path)
     {
-        $fixedSlashes = \preg_replace('~([/\\\\])+~', '/', $path);
+        $fixedSlashes = preg_replace('~([/\\\\])+~', '/', $path);
         $fixedSlashes = trim($fixedSlashes, '/');
         $fixedSlashes .= '/';
 

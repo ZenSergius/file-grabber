@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-//require_once __DIR__.'/FileGrabber/TestCase.php';
-
 spl_autoload_register(function($class)
 {
     $file = __DIR__.'/../src/'.strtr($class, '\\', '/').'.php';
