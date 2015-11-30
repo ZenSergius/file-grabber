@@ -38,17 +38,17 @@ class FileDownloader
     {
         if (file_exists($dirPath)) {
             if (!is_writable($dirPath)) {
-                if (!chmod($dirPath, 0644)) {//die('aaaaaa');
+                if (!chmod($dirPath, 0766)) {//die('aaaaaa');
                     throw new \RuntimeException('Can\'t set directory \'' . $dirPath . '\'' . 'writable.');
                 }
             }
         } else {
-            if (!mkdir($dirPath, 0644, true)) {
+            if (!mkdir($dirPath, 0766, true)) {
                 throw new \RuntimeException('Can\'t create default directory ' . $dirPath);
             }
 
             if (!is_writable($dirPath)) {
-                if (!chmod($dirPath, 0644)) {
+                if (!chmod($dirPath, 0766)) {
                     throw new \RuntimeException('Can not set directory \'' . $dirPath . '\'' . 'writable.');
                 }
             }
