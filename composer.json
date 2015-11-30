@@ -1,11 +1,16 @@
 {
-    "name": "vendor/file-grabber",
+    "name": "zen-sergius/file-grabber",
+	"type": "library",
     "description": "Allows to download files by their url into the file system",
-	"license": "GPL-2.0",
+	"keywords": ["download", "grab"],
+	"homepage": "https://github.com/ZenSergius/file-grabber"
+	"license": "MIT",
     "authors": [
         {
-            "name": "ZenSergius",
-            "email": "serg.progr@gmail.com"
+            "name": "Nazarenko Sergij",
+            "email": "serg.progr@gmail.com",
+			"homepage": "http://progr.in.ua/",
+			"role": "Developer"
         }
     ],
     "minimum-stability": "dev",
