@@ -1,4 +1,15 @@
 <?php
+
+/**
+ * This file is part of the FileGrabber package.
+ *
+ * (c) Sergij Nazarenko <serg.progr@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ * @package FileGrabber
+ */
+
 namespace {
     $testFunc_is_writable = false;
     $testFunc_chmod = false;
@@ -50,6 +61,12 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
     protected $fd_getcontent;
     protected $fd_curl;
 
+    /**
+     * Get file content from url for the tests.
+     * 
+     * @param string $url
+     * @return string
+     */
     public function getFileContent($url)
     {
         if (ini_get('allow_url_fopen')) {
@@ -67,6 +84,12 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         return $file_content;
     }
 
+    /**
+     * Recursively delete old directories after each test.
+     * 
+     * @param type $dir
+     * @return type
+     */
     public function delTree($dir)
     {
         $files = array_diff(scandir($dir), array('.', '..'));
@@ -76,6 +99,14 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         return rmdir($dir);
     }
 
+    /**
+     * Setting up variables for the tests.
+     * 
+     * @global boolean $testFunc_is_writable
+     * @global boolean $testFunc_chmod
+     * @global boolean $testFunc_mkdir
+     * @global boolean $testFunc_file_put_contents
+     */
     public function setUp()
     {
         global $testFunc_is_writable, $testFunc_chmod, $testFunc_mkdir, $testFunc_file_put_contents;
@@ -89,6 +120,9 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->fd_curl = new FileDownloader('', 'curl');
     }
 
+    /**
+     * Clearing old data.
+     */
     public function tearDown()
     {
         @$this->delTree('images');
@@ -98,12 +132,19 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         @$this->delTree('images_test2');
     }
 
+    /**
+     * @covers FileDownloader::__construct
+     */
     public function testInstance()
     {
         $this->assertInstanceOf('FileGrabber\FileDownloader', $this->fd_default);
+        $this->assertObjectHasAttribute('grabber', $this->fd_default);
+        $this->assertObjectHasAttribute('defaultSavePath', $this->fd_default);
     }
 
     /**
+     * @covers FileDownloader::__construct
+     * @covers FileDownloader::setGrabber
      * @expectedException InvalidArgumentException
      */
     public function testFileDownloaderInvalidMethod()
@@ -111,11 +152,12 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $fd = new FileDownloader('', 'invalid_grabber_method');
     }
 
+    /**
+     * @covers FileDownloader::getGtabberName
+     */
     public function testSetProperMethod()
     {
         $this->assertNotNull($this->fd_default->getGrabberName());
-        $this->assertAttributeInstanceOf('\finfo',
-            'fileInfo', $this->fd_default);
         $this->assertEquals('getcontent', $this->fd_default->getGrabberName());
         $this->assertAttributeInstanceOf('FileGrabber\Grabber\AbstractGrabber',
             'grabber', $this->fd_default);
@@ -133,33 +175,30 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
             'grabber', $this->fd_curl);
     }
 
-    public function testHasAttributes()
-    {
-        $this->assertObjectHasAttribute('grabber', $this->fd_default);
-        $this->assertObjectHasAttribute('defaultSavePath', $this->fd_default);
-    }
-
+    /**
+     * @covers FileDownloader::setDefaultDir
+     * @covers FileDownloader::getDefaultDir
+     * @covers FileDownloader::fixSlashes
+     */
     public function testFixSlashes()
     {
+        $this->assertEquals('images/', $this->fd_default->getDefaultDir());
         $this->fd_default->setDefaultDir('images_sub_dir');
         $this->assertEquals('images_sub_dir/', $this->fd_default->getDefaultDir());
         $this->fd_default->setDefaultDir('/images_test/sub/dir/');
-        $this->assertEquals('images_test/sub/dir/', $this->fd_default->getDefaultDir());
+        $this->assertEquals('/images_test/sub/dir/', $this->fd_default->getDefaultDir());
         $this->fd_default->setDefaultDir('//images_test///sub///dir///');
-        $this->assertEquals('images_test/sub/dir/', $this->fd_default->getDefaultDir());
+        $this->assertEquals('/images_test/sub/dir/', $this->fd_default->getDefaultDir());
         $this->fd_default->setDefaultDir('/\\/images_test/\//sub/\/dir//\/');
-        $this->assertEquals('images_test/sub/dir/', $this->fd_default->getDefaultDir());
-        $this->fd_default->setDefaultDir('\images_test\sub\dir\\');
+        $this->assertEquals('/images_test/sub/dir/', $this->fd_default->getDefaultDir());
+        $this->fd_default->setDefaultDir('images_test\sub\dir\\');
         $this->assertEquals('images_test/sub/dir/', $this->fd_default->getDefaultDir());
     }
 
-    public function testGetDefaultDir()
-    {
-        $this->assertEquals('images/', $this->fd_default->getDefaultDir());
-        $this->fd_default->setDefaultDir('images_new_dir');
-        $this->assertEquals('images_new_dir/', $this->fd_default->getDefaultDir());
-    }
-    
+    /**
+     * Test default grabber work.
+     * @covers FileDownloader::download
+     */
     public function testDownloadFileDefault()
     {
         $testUrl = 'https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2_1x.png';
@@ -178,7 +217,11 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFileEquals('images/test_content2.png', 'images/custom/subdir/logoA.gif');
         $this->assertEquals('logoA.gif', $file_name2);
     }
-    
+
+    /**
+     * Test get_content grabber work.
+     * @covers FileDownloader::download
+     */
     public function testDownloadFileContent()
     {
         $testUrl = 'https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2_1x.png';
@@ -198,6 +241,10 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('logoA.gif', $file_name2);
     }
 
+    /**
+     * Test curl grabber work.
+     * @covers FileDownloader::download
+     */
     public function testDownloadFileCurl()
     {
         $testUrl = 'https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2_1x.png';
@@ -218,6 +265,7 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers FileDownloader::download
      * @expectedException InvalidArgumentException
      */
     public function testWrongExtension()
@@ -226,6 +274,11 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->fd_default->download($testUrl);
     }
 
+    /**
+     * Test situation when directory file is not writable
+     * @covers FileDownloader::setDefaultDir
+     * @global boolean $testFunc_is_writable
+     */
     public function testCreateDirpath1()
     {
         global $testFunc_is_writable;
@@ -233,6 +286,11 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->fd_default->setDefaultDir('images_exists');
     }
 
+    /**
+     * Test situation when directory file is not writable and can't change writable rights
+     * @covers FileDownloader::setDefaultDir
+     * @global boolean $testFunc_is_writable
+     */
     public function testCreateDirpath2()
     {
         global $testFunc_chmod, $testFunc_is_writable;
@@ -242,6 +300,11 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->fd_default->setDefaultDir('images_exists');
     }
 
+    /**
+     * Test situation when directory file is not writable and can't change writable rights and can't create directory
+     * @covers FileDownloader::setDefaultDir
+     * @global boolean $testFunc_is_writable
+     */
     public function testCreateDirpath3()
     {
         global $testFunc_is_writable, $testFunc_chmod, $testFunc_mkdir;
@@ -252,6 +315,11 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->fd_default->setDefaultDir('images_test');
     }
 
+    /**
+     * Test situation when directory file is not writable and can't change writable rights
+     * @covers FileDownloader::setDefaultDir
+     * @global boolean $testFunc_is_writable
+     */
     public function testCreateDirpath4()
     {
         global $testFunc_is_writable, $testFunc_chmod;
@@ -261,6 +329,11 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->fd_default->setDefaultDir('images_test2');
     }
 
+    /**
+     * Test situation when directory file is not writable
+     * @covers FileDownloader::setDefaultDir
+     * @global boolean $testFunc_is_writable
+     */
     public function testCreateDirpath5()
     {
         global $testFunc_is_writable;
@@ -268,6 +341,11 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->fd_default->setDefaultDir('images_test2');
     }
 
+    /**
+     * Test situation when can't save file
+     * @covers FileDownloader::download
+     * @global boolean $testFunc_file_put_contents
+     */
     public function testFilePutContentsError()
     {
         global $testFunc_file_put_contents;
@@ -277,6 +355,12 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->fd_default->download($testUrl);
     }
 
+    /**
+     * Test situation when url has no valid characters or has no filename.
+     * In this case filename should be generated
+     *
+     * @covers FileDownloader::download
+     */
     public function testFilenameGenerator()
     {
         $testUrl='https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQPlX4Pm4SggadSIpK1scen1q-vRMjF0-1lncaJpIpb_231KyPQLA';
@@ -286,24 +370,36 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($filename);
     }
 
+    /**
+     * @covers FileDownloader::download
+     */
     public function testNoUrl1()
     {
         $this->setExpectedException('InvalidArgumentException');
         $filename = $this->fd_getcontent->download('');
     }
 
+    /**
+     * @covers FileDownloader::download
+     */
     public function testIncorrectUrl1()
     {
         $this->setExpectedException('InvalidArgumentException');
         $filename = $this->fd_getcontent->download('incorrect_site.com');
     }
 
+    /**
+     * @covers FileDownloader::download
+     */
     public function testNoUrl2()
     {
         $this->setExpectedException('InvalidArgumentException');
         $filename = $this->fd_curl->download('');
     }
 
+    /**
+     * @covers FileDownloader::download
+     */
     public function testIncorrectUrl2()
     {
         $this->setExpectedException('InvalidArgumentException');
