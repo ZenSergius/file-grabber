@@ -185,12 +185,6 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('images/', $this->fd_default->getDefaultDir());
         $this->fd_default->setDefaultDir('images_sub_dir');
         $this->assertEquals('images_sub_dir/', $this->fd_default->getDefaultDir());
-        $this->fd_default->setDefaultDir('/images_test/sub/dir/');
-        $this->assertEquals('/images_test/sub/dir/', $this->fd_default->getDefaultDir());
-        $this->fd_default->setDefaultDir('//images_test///sub///dir///');
-        $this->assertEquals('/images_test/sub/dir/', $this->fd_default->getDefaultDir());
-        $this->fd_default->setDefaultDir('/\\/images_test/\//sub/\/dir//\/');
-        $this->assertEquals('/images_test/sub/dir/', $this->fd_default->getDefaultDir());
         $this->fd_default->setDefaultDir('images_test\sub\dir\\');
         $this->assertEquals('images_test/sub/dir/', $this->fd_default->getDefaultDir());
     }
